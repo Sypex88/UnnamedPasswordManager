@@ -1,16 +1,37 @@
 #include <iostream>
+#include <fstream>
+#include <string>
+using namespace std;
 
-// TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+void menu(string option1, string option2 = "", string option3 = "", string option4 = "", string text1 = "")
+{
+    cout << option1 << "\n"
+         << option2 << "\n"
+         << option3 << "\n"
+         << option4 << "\n"
+         << text1 << "\n\n";
+}
+
 int main() {
-    // TIP Press <shortcut actionId="RenameElement"/> when your caret is at the <b>lang</b> variable name to see how CLion can help you rename it.
-    auto lang = "C++";
-    std::cout << "Hello and welcome to " << lang << "!\n";
-
-    for (int i = 1; i <= 5; i++) {
-        // TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-        std::cout << "i = " << i << std::endl;
+    int anwser;
+    string URL;
+    string username;
+    string password;
+    menu("1.Add Password", "2.Show Passwords", "3.Close", "","Choose an option:");
+    cin >> anwser;
+    switch (anwser) {
+        case 1:
+            menu("Website URL:");
+            cin >> URL;
+            menu("Username:");
+            cin >> username;
+            menu("Password:");
+            cin >> password;
+            menu("Are these Informations correct?:", "URL:"+URL, "Username:"+username,"Password:"+password);
+            //if correct >> Save information in json file, if not >> Change options/Cancel password entry//
+            break;
+        case 2:;
+            //add other options//
     }
-
-    return 0;
-    // TIP See CLion help at <a href="https://www.jetbrains.com/help/clion/">jetbrains.com/help/clion/</a>. Also, you can try interactive lessons for CLion by selecting 'Help | Learn IDE Features' from the main menu.
+    //add en- decryption
 }

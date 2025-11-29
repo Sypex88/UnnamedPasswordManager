@@ -7,7 +7,8 @@
 #include <thread>
 #include <stdexcept>
 #include <sstream>
-
+//TODO if master pw isnt set create variable in json
+//TODO bug: password temporary dublicating(not json) on show passwords duplicates
 using namespace std;
 using json = nlohmann::json;
 
@@ -171,7 +172,7 @@ int main() {
                         cout << "--------------------\n";
                         cout << "URL:\n"+e.jsonURL << "\n\n";
                         cout << "Username:\n"+e.jsonUsername << "\n\n";
-                        cout << "Password:\n"+e.jsonPassword << "\n";
+                        cout << "Password:\n"+e.jsonPassword << "\n\n";
                     }
 
                     prntmenu("What would you like to do??\n", "1.Return to menu", "2.Edit Passwords", "3.Delete Entry",   "4.Quit\n\nPlease Choose an Option \n");

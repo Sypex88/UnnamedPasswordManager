@@ -9,7 +9,7 @@
 #include <sstream>
 using namespace std;
 using json = nlohmann::json;
-
+//TODO bug when on option select typing a string
 void prntmenu(string option1, string option2 = "", string option3 = "", string option4 = "", string text1 = "")
 {
     if (option1 != "") option1 += "\n";
@@ -87,6 +87,7 @@ int main() {
 
     cout << "Access granted!\n\n";
     this_thread::sleep_for(chrono::milliseconds(800));
+
     do {
         if (jFile.contains("Entries")) {
             entries.clear();
@@ -96,9 +97,8 @@ int main() {
             }
         }
 
-
-
         prntmenu("1.Add Password", "2.Show Passwords", "3.Close", "", "Choose an option:");
+
         cin >> answer1;
 
         switch (answer1) {
@@ -156,7 +156,7 @@ int main() {
                         cout << "Invalid input.\n\n";
                     }
                     break;
-                    break;
+
                 }
                 break;
             }
@@ -175,23 +175,18 @@ int main() {
                         cout << "Password:\n"+e.jsonPassword << "\n\n";
                     }
 
-                    prntmenu("Please choose an option\n", "1.Return to menu", "2.Edit Passwords", "3.Delete Entry",   "4.Quit\nChoose an option: \n");
+                    prntmenu("Please choose an option\n", "1.Return to menu", "2.Edit Passwords", "3.Delete Entry",   "4.Quit\nChoose an option:");
 
                     cin >> answer;
 
                     if (answer == "1") {
-                        skip = true;
+
                     }
                     else if (answer == "2") {
-                        int i = 1;
-                        for (auto& e : entries) {
-                            cout << i <<". URL:\n" << e.jsonURL << "\n";
-                            i++;
-                        }
                         prntmenu("Select an Entry:\n\n");
                         // TODO i= options, dynamicly choose entry
+                        index = 1;
                         for (auto& e : entries) {
-
                             cout << index <<"."+e.jsonURL << "\n";
                             index++;
                         }
@@ -252,15 +247,66 @@ int main() {
                         }
                         else
                             cout << "Invalid input.\n\n";
-
-                    }
+                        }
                     else if (answer == "3") {
-                        // TODO Show entries and choose entry copy from above
+                        RunLoop = true;
+                        while (RunLoop) {
+                           index = 1;
+                            for (auto& e : entries) {
+                                cout << index <<"."+e.jsonURL << "\n";
+                                index++;
+                            }
+                            cout << "Select an Entry:\n\n";
+                            cin >> answer1;
+                            if (answer1 >= 1 || answer1 <= entries.size()) {
+                                Entry& e = entries[answer1 -1];
+                                RunLoop = true;
+                                while (RunLoop) {
+                                    cout << "\nYou selected:\n";
+                                    cout << "URL: " << e.jsonURL << "\n";
+                                    cout << "Username: " << e.jsonUsername << "\n";
+                                    cout << "Password: " << e.jsonPassword << "\n";
+                                    cout << "Are you sure you want to delete the entry? 1.Yes 2.No\n\n";
+                                    cin >> answer;
+                                    if (answer == "yes" || answer == "1") {
+                                        RunLoop = false;
+                                        //delete entry
+                                        entries.erase(entries.begin() + (answer1 - 1));
+                                        jFile["Entries"].clear();
+                                        for (auto& entry : entries) {
+                                            jFile["Entries"].push_back(entry);
+                                        }
+                                        ofstream out("../../data.json");
+                                        out << jFile.dump(4);
+                                        out.close();
+                                        cout << "Entry successfully deleted!\n\n";
+                                        break;
+                                    }
+                                    else if (answer == "no" || answer == "2") {
+                                        RunLoop = false;
+                                        break;
+                                    }
+                                    else {
+                                        cout << "Invalid input.\n\n";
+                                        RunLoop = true;
+                                    }
+                                }
+                            }
+                            else if (answer1 <= 1 || answer1 >= entrysize) { //TODO doesnt execute = Fatal error
+                                cout << "Invalid input.\n\n";
+                                RunLoop = true;
+                            }
+
+
+                        }
 
                     }
                     else if (answer == "4") {
                         return 0;
                     }
+                    else
+                        cout << "Invalid input.\n\n";
+
                 }
                 break;
 
@@ -272,8 +318,6 @@ int main() {
                 return 0;
         }
     } while (true);
-
-
 
 
 }

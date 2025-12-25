@@ -7,8 +7,11 @@
 #include <thread>
 #include <stdexcept>
 #include <sstream>
+#include <sodium.h>
+#include "VaultCrypto.h"
 using namespace std;
 using json = nlohmann::json;
+
 void prntmenu(string option1, string option2 = "", string option3 = "", string option4 = "", string text1 = "")
 {
     if (option1 != "") option1 += "\n";
@@ -43,48 +46,76 @@ void from_json(const json& j, Entry& e) {
 int main() {
     bool CloseProgram = false;
     bool InvalidInput = false;
+    bool isNewVault = false;
     int index = 1;
+    string encryptedData;
     string answer;
     int answer1;
     string URL, username, password;
     bool skip = false;
     int entrysize = 0;
     bool RunLoop = true;
-
     json jFile;
     string storedMasterPassword;
     vector<Entry> entries;
 
-    ifstream infile("../../data.json");
+
+    if(sodium_init() < 0) {
+        cout << "Sodium not initialized!\n\n";
+        return 1;
+    }
+
+
+    ifstream infile("../../data.json", ios::binary);
     if (infile.good()) {
-        infile >> jFile;
-        if (jFile.contains("MasterPassword"))
-            storedMasterPassword = jFile["MasterPassword"].get<string>();
+        encryptedData.assign(
+            (istreambuf_iterator<char>(infile)),
+            istreambuf_iterator<char>()
+        );
+    } else {
+        isNewVault = true;
     }
     infile.close();
 
-    if (storedMasterPassword.empty()) {
+
+
+    if (isNewVault) {
         cout << "Create Master Password:\n> ";
         cin >> storedMasterPassword;
 
-        jFile["MasterPassword"] = storedMasterPassword;
         jFile["Entries"] = json::array();
 
-        ofstream out("../../data.json");
-        out << jFile.dump(4);
+        string plainJson = jFile.dump(4);
+        string encryptedOut =
+            VaultCrypto::encryptJSON(plainJson, storedMasterPassword);
+
+        ofstream out("../../data.json", ios::binary);
+        out.write(encryptedOut.data(), encryptedOut.size());
         out.close();
+
+        cout << "Vault created!\n\n";
     }
 
 
-    while (true) {
-        cout << "Enter Master Password:\n> ";
-        cin >> answer;
 
-        if (answer == storedMasterPassword)
-            break;
 
-        cout << "Incorrect Master Password!\n\n";
+
+    if (!isNewVault) {
+        while (true) {
+            cout << "Enter Master Password:\n> ";
+            cin >> storedMasterPassword;
+
+            try {
+                string decryptedJson =
+                    VaultCrypto::decryptJSON(encryptedData, storedMasterPassword);
+                jFile = json::parse(decryptedJson);
+                break;
+            } catch (...) {
+                cout << "Incorrect Master Password!\n\n";
+            }
+        }
     }
+
 
     cout << "Access granted!\n\n";
     this_thread::sleep_for(chrono::milliseconds(800));
@@ -142,19 +173,16 @@ int main() {
 
                             jFile["Entries"].push_back(newEntry);
 
-                            ofstream out("../../data.json");
-                            out << jFile.dump(4);
-                            out.close();
 
                             prntmenu("Password Saved!\n", "1.Return to menu", "2.Quit", "", "Please Choose an Option");
 
                             cin >> answer;
                             switch (answer1) {
                                 case 1: {
-                                    continue;
+                                    continue;//TODO Freeze
                                 }
                                 case 2: {
-                                    return 0;
+                                    return 0; //TODO doesnt end programm just freezes
                                 }
                             }
 
@@ -240,9 +268,7 @@ int main() {
                                                     for (auto& entry : entries) {
                                                         jFile["Entries"].push_back(entry);
                                                     }
-                                                    ofstream out("../../data.json");
-                                                    out << jFile.dump(4);
-                                                    out.close();
+
                                                     RunLoop = true;
                                                     break;//TODO doesnt jump to main menu
                                                 }
@@ -254,9 +280,7 @@ int main() {
                                                     for (auto& entry : entries) {
                                                         jFile["Entries"].push_back(entry);
                                                     }
-                                                    ofstream out("../../data.json");
-                                                    out << jFile.dump(4);
-                                                    out.close();
+
                                                     continue;
                                                 }
                                                 case 3: {
@@ -266,9 +290,7 @@ int main() {
                                                     for (auto& entry : entries) {
                                                         jFile["Entries"].push_back(entry);
                                                     }
-                                                    ofstream out("../../data.json");
-                                                    out << jFile.dump(4);
-                                                    out.close();
+
                                                     cout << "Password Saved!\n\n";
                                                     continue;
                                                 }
@@ -319,9 +341,7 @@ int main() {
                                             for (auto& entry : entries) {
                                                 jFile["Entries"].push_back(entry);
                                             }
-                                            ofstream out("../../data.json");
-                                            out << jFile.dump(4);
-                                            out.close();
+
                                             cout << "Entry successfully deleted!\n\n";
                                             break;
                                         }
@@ -361,6 +381,18 @@ int main() {
                 return 0;
             }
         }
+
+        string plainJson = jFile.dump(4);
+
+        string encryptedOut =
+            VaultCrypto::encryptJSON(plainJson, storedMasterPassword);
+
+        ofstream out("../../data.json", ios::binary);
+        out.write(encryptedOut.data(), encryptedOut.size());
+        out.close();
+
+        sodium_memzero(storedMasterPassword.data(), storedMasterPassword.size());
+
 
     } while (true);
 

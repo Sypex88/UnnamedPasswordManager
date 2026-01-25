@@ -1,0 +1,17 @@
+
+cmake-build-*/
+build/
+
+
+*.user
+*.autosave
+*.pro.user*
+
+# OS / IDE
+.idea/
+.vscode/
+
+
+*.db
+*.key
+*.env

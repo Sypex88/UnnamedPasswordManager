@@ -13,6 +13,8 @@ find_package(Qt6 COMPONENTS
         Gui
         Widgets
         REQUIRED)
+find_package(unofficial-sodium CONFIG REQUIRED)
+
 
 add_executable(untitled4 "Source Files/main.cpp"
         "Source Files/mainwindow.cpp"
@@ -21,16 +23,25 @@ add_executable(untitled4 "Source Files/main.cpp"
         "Source Files/loginwindow.cpp"
         "Header Files/loginwindow.h"
         "Forms/loginwindow.ui"
+        "Source Files/VaultCrypto.cpp"
+        "Source Files/VaultStorage.cpp"
+        "Header Files/VaultCrypto.h"
+        "Header Files/Entry.h"
+        "Header Files/VaultStorage.h"
+        "Header Files/VaultManager.h"
+        "Header Files/json.hpp"
 )
 target_include_directories(untitled4 PRIVATE
         "Header Files"
 )
 
 target_link_libraries(untitled4
+        PRIVATE unofficial-sodium::sodium
         Qt::Core
         Qt::Gui
         Qt::Widgets
 )
+
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(DEBUG_SUFFIX)

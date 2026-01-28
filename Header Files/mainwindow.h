@@ -6,6 +6,9 @@
 #define UNTITLED4_MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QListWidget>
+#include <QListWidgetItem>
+
 
 
 QT_BEGIN_NAMESPACE

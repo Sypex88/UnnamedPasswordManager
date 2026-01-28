@@ -1,0 +1,8 @@
+//
+// Created by trbec on 28.01.2026.
+//
+
+#ifndef UNTITLED4_VAULTSTORAGE_H
+#define UNTITLED4_VAULTSTORAGE_H
+
+#endif //UNTITLED4_VAULTSTORAGE_H

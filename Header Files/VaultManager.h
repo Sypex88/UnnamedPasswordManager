@@ -1,0 +1,8 @@
+//
+// Created by trbec on 28.01.2026.
+//
+
+#ifndef UNTITLED4_VAULTMANAGER_H
+#define UNTITLED4_VAULTMANAGER_H
+
+#endif //UNTITLED4_VAULTMANAGER_H
